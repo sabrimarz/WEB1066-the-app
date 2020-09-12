@@ -7,6 +7,7 @@ env:
   matrix:
   - COVERAGE=0.3 ./gradlew test jacocoTestCoverageVerification
   - COVERAGE=0.5 ./gradlew -p ./monolithic/ui check
+  - COVERAGE=0.5 ./gradlew -p ./monolithic/ui packageToContainer
   - COVERAGE=0.5 ./gradlew -p ./monolithic/service/cart check
   - COVERAGE=0.5 ./gradlew -p ./monolithic/service/user check
   - COVERAGE=0.5 ./gradlew -p ./monolithic/repository/order check
@@ -22,6 +23,10 @@ language: java
 script:
 - "./gradlew clean jar"
 deploy : 
-provider : script
-script : bash -c "echo \"${DOCKER_PASSWORD}\" | docker login --username \"${DOCKER_LOGIN}\" --password-stdin"
-
+provider : 
+script : 
+- bash -c "echo \"${DOCKER_PASSWORD}\" | docker login --username \"${DOCKER_LOGIN}\" --password-stdin"
+- docker build -t publics .
+- docker images
+- docker tag publics $DOCKER_LOGIN/publics
+- docker push $DOCKER_LOGIN/publics
